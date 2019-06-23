@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="otBookNames">
+        <item>Genesis</item>
+        <item>Exodus</item>
+        <item>Leviticus</item>
+        <item>Numbers</item>
+        <item>Deuteronomy</item>
+        <item>Joshua</item>
+        <item>Judges</item>
+        <item>Ruth</item>
+        <item>1 Samuel</item>
+        <item>2 Samuel</item>
+        <item>1 Kings</item>
+        <item>2 Kings</item>
+        <item>1 Chronicles</item>
+        <item>2 Chronicles</item>
+        <item>Ezra</item>
+        <item>Nehemiah</item>
+        <item>Esther</item>
+        <item>Job</item>
+        <item>Psalms</item>
+        <item>Proverbs</item>
+        <item>Ecclesiastes</item>
+        <item>Song of Solomon</item>
+        <item>Isaiah</item>
+        <item>Jeremiah</item>
+        <item>Lamentations</item>
+        <item>Ezekiel</item>
+        <item>Daniel</item>
+        <item>Hosea</item>
+        <item>Joel</item>
+        <item>Amos</item>
+        <item>Obadiah</item>
+        <item>Jonah</item>
+        <item>Micah</item>
+        <item>Nahum</item>
+        <item>Habakkuk</item>
+        <item>Zephaniah</item>
+        <item>Haggai</item>
+        <item>Zechariah</item>
+        <item>Malachi</item>
+    </string-array>
+    <array name="otBookChapters">
+        <item>50</item>
+        <item>40</item>
+        <item>27</item>
+        <item>36</item>
+        <item>34</item>
+        <item>24</item>
+        <item>21</item>
+        <item>4</item>
+        <item>31</item>
+        <item>24</item>
+        <item>22</item>
+        <item>25</item>
+        <item>29</item>
+        <item>36</item>
+        <item>10</item>
+        <item>13</item>
+        <item>10</item>
+        <item>42</item>
+        <item>150</item>
+        <item>31</item>
+        <item>12</item>
+        <item>8</item>
+        <item>66</item>
+        <item>52</item>
+        <item>5</item>
+        <item>48</item>
+        <item>12</item>
+        <item>14</item>
+        <item>3</item>
+        <item>9</item>
+        <item>1</item>
+        <item>4</item>
+        <item>7</item>
+        <item>3</item>
+        <item>3</item>
+        <item>3</item>
+        <item>2</item>
+        <item>14</item>
+        <item>4</item>
+    </array>
+    <string-array name="ntBookNames">
+        <item>Matthew</item>
+        <item>Mark</item>
+        <item>Luke</item>
+        <item>John</item>
+        <item>Acts</item>
+        <item>Romans</item>
+        <item>1 Corinthians</item>
+        <item>2 Corinthians</item>
+        <item>Galatians</item>
+        <item>Ephesians</item>
+        <item>Philippians</item>
+        <item>Colossians</item>
+        <item>1 Thessalonians</item>
+        <item>2 Thessalonians</item>
+        <item>1 Timothy</item>
+        <item>2 Timothy</item>
+        <item>Titus</item>
+        <item>Philemon</item>
+        <item>Hebrews</item>
+        <item>James</item>
+        <item>1 Peter</item>
+        <item>2 Peter</item>
+        <item>1 John</item>
+        <item>2 John</item>
+        <item>3 John</item>
+        <item>Jude</item>
+        <item>Revelation</item>
+    </string-array>
+    <array name="ntBookChapters">
+        <item>28</item>
+        <item>16</item>
+        <item>24</item>
+        <item>21</item>
+        <item>28</item>
+        <item>16</item>
+        <item>16</item>
+        <item>13</item>
+        <item>6</item>
+        <item>6</item>
+        <item>4</item>
+        <item>4</item>
+        <item>5</item>
+        <item>3</item>
+        <item>6</item>
+        <item>4</item>
+        <item>3</item>
+        <item>1</item>
+        <item>13</item>
+        <item>5</item>
+        <item>5</item>
+        <item>3</item>
+        <item>5</item>
+        <item>1</item>
+        <item>1</item>
+        <item>1</item>
+        <item>22</item>
+    </array>
+    <string-array name="ntVersesPerChapter">
+        <item name="Matthew">25,23,17,25,48,34,29,34,38,42,30,50,58,36,39,28,27,35,30,34,46,46,39,51,46,75,66,20</item>
+        <item name="Mark">45,28,35,41,43,56,37,38,50,52,33,44,37,72,47,20</item>
+        <item name="Luke">80,52,38,44,39,49,50,56,62,42,54,59,35,35,32,31,37,43,48,47,38,71,56,53</item>
+        <item name="John">51,25,36,54,47,71,53,59,41,42,57,50,38,31,27,33,26,40,42,31,25</item>
+        <item name="Acts">26,47,26,37,42,15,60,40,43,48,30,25,52,28,41,40,34,28,40,38,40,30,35,27,27,32,44,31</item>
+        <item name="Romans">32,29,31,25,21,23,25,39,33,21,36,21,14,23,33,27</item>
+        <item name="1 Corinthians">31,16,23,21,13,20,40,13,27,33,34,31,13,40,58,24</item>
+        <item name="2 Corinthians">24,17,18,18,21,18,16,24,15,18,33,21,13</item>
+        <item name="Galatians">24,21,29,31,26,18</item>
+        <item name="Ephesians">23,22,21,32,33,24</item>
+        <item name="Philippians">30,30,21,23</item>
+        <item name="Colossians">29,23,25,18</item>
+        <item name="1 Thessalonians">10,20,13,18,28</item>
+        <item name="2 Thessalonians">12,17,18</item>
+        <item name="1 Timothy">20,15,16,16,25,21</item>
+        <item name="2 Timothy">18,26,17,22</item>
+        <item name="Titus">16,15,15</item>
+        <item name="Philemon">25</item>
+        <item name="Hebrews">14,18,19,16,14,20,28,13,28,39,40,29,25</item>
+        <item name="James">27,26,18,17,20</item>
+        <item name="1 Peter">25,25,22,19,14</item>
+        <item name="2 Peter">21,22,18</item>
+        <item name="1 John">10,29,24,21,21</item>
+        <item name="2 John">13</item>
+        <item name="3 John">15</item>
+        <item name="Jude">25</item>
+        <item name="Revelation">20,29,22,11,14,17,17,13,21,11,19,17,18,20,8,21,18,24,21,15,27,21</item>
+    </string-array>
+</resources>
