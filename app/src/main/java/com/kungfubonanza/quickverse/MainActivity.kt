@@ -188,6 +188,11 @@ class MainActivity : AppCompatActivity() {
 
         ArrayAdapter.createFromResource(this, R.array.ntBookNames, R.layout.spinner_item
         ).also { adapter ->
+
+            var ntBookName : String
+            var ntBookChapter : Int = 0
+            var ntBookVerse : Int = 0
+
             // specify the layout to use when the list of choices appears
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             // apply the adapter to the spinner
@@ -199,6 +204,8 @@ class MainActivity : AppCompatActivity() {
                     //findViewById<TextView>(R.id.ntBookName).text = ntBooks[position].name
                     //findViewById<TextView>(R.id.ntBookChapter).text = ntBooks[position].chapters.toString()
 
+                    ntBookName = ntBooks[position].name
+
                     // populate the chapter spinner with an item for each chapter in the book
                     var chapterSpinner = findViewById<Spinner>(R.id.ntChapterSpinner)
                     chapterSpinner.adapter = ArrayAdapter(this@MainActivity, R.layout.spinner_item, Array<Int>(ntBooks[position].chapters) { i -> i+1})
@@ -207,12 +214,25 @@ class MainActivity : AppCompatActivity() {
                     chapterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                         override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
 
+                            ntBookChapter = parent.getItemAtPosition(position).toString().toInt()
+
                             // populate the verse spinner with an item for each verse in the book
                             var verseSpinner = findViewById<Spinner>(R.id.ntVerseSpinner)
-                            verseSpinner.adapter = ArrayAdapter(
-                                this@MainActivity,
-                                R.layout.spinner_item,
-                                Array<Int>(ntBooks[position].versesPerChapter[position]) { i -> i + 1 })
+                            verseSpinner.adapter = ArrayAdapter(this@MainActivity, R.layout.spinner_item, Array<Int>(ntBooks[position].versesPerChapter[position]) { i -> i + 1 })
+
+                            verseSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                                override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+
+                                    ntBookVerse = parent.getItemAtPosition(position).toString().toInt()
+
+                                    val myToast = Toast.makeText(this@MainActivity, "$ntBookName $ntBookChapter:$ntBookVerse", Toast.LENGTH_SHORT)
+                                    myToast.show()
+                                }
+
+                                override fun onNothingSelected(parent: AdapterView<*>) {
+                                    // Code to perform some action when nothing is selected
+                                }
+                            }
                         }
 
                         override fun onNothingSelected(parent: AdapterView<*>) {
