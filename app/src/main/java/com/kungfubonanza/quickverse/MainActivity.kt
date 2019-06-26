@@ -4,124 +4,15 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.*
-import com.beust.klaxon.Klaxon
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.Headers
-import com.github.kittinunf.fuel.core.extensions.cUrlString
-
-data class EsvApiResponsePassageMeta(
-    val canonical: String,
-    val chapter_start: List<Int>,
-    val chapter_end: List<Int>,
-    val prev_verse: Int,
-    val next_verse: Int,
-    val prev_chapter: List<Int>,
-    val next_chapter: List<Int>
-)
-
-data class EsvApiResponse(
-    val query: String,
-    val canonical: String,
-    val parsed: List<List<Int>>,
-    val passage_meta: List<EsvApiResponsePassageMeta>,
-    val passages: List<String>
-)
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
 
     data class BibleBook(val name: String, val chapters: Int, val versesPerChapter: IntArray)
 
-    private fun getVerseText(verse: String) : String? {
-        val testResult = Klaxon()
-            .parse<EsvApiResponse>(
-                """
-{
-  "query": "John 11:35",
-  "canonical": "John 11:35",
-  "parsed": [
-    [
-      43011035,
-      43011035
-    ]
-  ],
-  "passage_meta": [
-    {
-      "canonical": "John 11:35",
-      "chapter_start": [
-        43011001,
-        43011057
-      ],
-      "chapter_end": [
-        43011001,
-        43011057
-      ],
-      "prev_verse": 43011034,
-      "next_verse": 43011036,
-      "prev_chapter": [
-        43010001,
-        43010042
-      ],
-      "next_chapter": [
-        43012001,
-        43012050
-      ]
-    }
-  ],
-  "passages": [
-    "John 11:35\n\n  [35] Jesus wept. (ESV)"
-  ]
-}
-            """)
-
-
-        //Test Test Test
-
-        assert("John 11:35" == testResult?.query)
-        assert("John 11:35" == testResult?.canonical)
-        assert(listOf(43011035,43011035) == testResult?.parsed?.get(0))
-        assert(listOf(43010001,43010042) == testResult?.passage_meta?.get(0)?.prev_chapter)
-
-       // println("DOODODODODODODODO ${result?.query} -- ${result?.passages?.get(0)}--------------")
-
-        //return result?.passages?.get(0)
-
-        val esvApiKey = "Token f5e237de333408ce3cf7481d75c1d9f4c80e6718"
-
-        var passage: String? = null
-
-        Fuel.get("https://api.esv.org/v3/passage/text/?", listOf("q" to "John+11:35"))
-            .header(Headers.ACCEPT, "application/json")
-            .header(Headers.AUTHORIZATION, esvApiKey)
-            .response { request, response, result ->
-                println("CURL S: ${request.cUrlString()}")
-                //println(response)
-                val (bytes, error) = result
-                if (bytes != null) {
-                    //println("[response bytes] ${String(bytes)}")
-                    val responseBody = String(response.body().toByteArray())
-                    println("RESPONSE BODY: $responseBody")
-                    val apiResponse = Klaxon().parse<EsvApiResponse>(responseBody)
-                    //println("TEH QUERY IS: ${apiResponse?.query}")
-
-                    println("THE PASSAGE: ${apiResponse?.passages?.get(0)}")
-
-                    passage = apiResponse?.passages?.get(0)
-
-                }
-
-            }.run { passage = "hello"}
-
-            println(passage)
-
-        return passage
-    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        var verseText = getVerseText("John 11:35")
 
         // build an array of book names
         val ntBookNames: Array<String> = resources.getStringArray(R.array.ntBookNames)
@@ -152,15 +43,6 @@ class MainActivity : AppCompatActivity() {
         for(book in ntBooks) {
             assert(book.chapters == book.versesPerChapter.count())
         }
-
-
-        // Get our IP
-        //val s = (khttp.get("http://httpbin.org/ip").jsonObject.getString("origin"))
-        // Get our IP in a simpler way
-        //println(khttp.get("http://icanhazip.com").text)
-      //  val myToast = Toast.makeText(this@MainActivity, "$s", Toast.LENGTH_SHORT)
-      //  myToast.show()
-
 
         //val ntBookNames: Array<String> = resources.getStringArray(R.array.ntBookNames)
         //val ntBookChapters: IntArray = resources.getIntArray(R.array.ntBookChapters)
@@ -206,6 +88,7 @@ class MainActivity : AppCompatActivity() {
                                 override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
 
                                     ntBookVerse = parent.getItemAtPosition(position).toString().toInt()
+                                    executeVerseLookup()
 
                                 }
 
@@ -219,9 +102,6 @@ class MainActivity : AppCompatActivity() {
                             // Code to perform some action when nothing is selected
                         }
                     }
-
-                        //val myToast = Toast.makeText(this@MainActivity, "${parent.getItemAtPosition(position)}", Toast.LENGTH_SHORT)
-                        //myToast.show()
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
@@ -230,11 +110,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun executeVerseLookup() {
+        GlobalScope.launch(Dispatchers.Main) {
+            val verseText = EsvApi().getVerseText("John 11:35") ?: "failed"
+            println("THE RESULT IS $verseText")
+            findViewById<TextView>(R.id.verseText).text = verseText
+        }
+    }
 }
 
 class ntSpinnerActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
-
-
     override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
         // An item was selected. You can retrieve the selected item using
         parent.getItemAtPosition(pos).toString()
