@@ -28,24 +28,6 @@ data class EsvApiResponse(
 )
 
 class MainActivity : AppCompatActivity() {
-/*
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-       // TODO("nnt implemented") //To change body of created functions use File | Settings | File Templates.
-
-        var helloString : String = ""
-        when(parent) {
-            findViewById<Spinner>(R.id.ntSpinner) -> helloString = "Hello NT $id"
-            findViewById<Spinner>(R.id.ntSpinner) -> helloString = "Hello nt $id"
-        }
-
-      //  if(view === findViewById<Spinner>(R.id.ntSpinner)) {
-            val myToast = Toast.makeText(this, helloString, Toast.LENGTH_SHORT)
-            myToast.show()
-        //}
-
-
-    }
-*/
 
     data class BibleBook(val name: String, val chapters: Int, val versesPerChapter: IntArray)
 
@@ -225,8 +207,6 @@ class MainActivity : AppCompatActivity() {
 
                                     ntBookVerse = parent.getItemAtPosition(position).toString().toInt()
 
-                                    val myToast = Toast.makeText(this@MainActivity, "$ntBookName $ntBookChapter:$ntBookVerse", Toast.LENGTH_SHORT)
-                                    myToast.show()
                                 }
 
                                 override fun onNothingSelected(parent: AdapterView<*>) {
