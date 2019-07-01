@@ -22,9 +22,6 @@ data class BibleRef(var book: String, var chapter: Int, var verse: Int) {
 data class BibleBook(val name: String, val chapters: Int, val versesPerChapter: IntArray)
 
 class MainActivity : AppCompatActivity() {
-
-    data class BibleBook(val name: String, val chapters: Int, val versesPerChapter: IntArray)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -51,8 +48,8 @@ class MainActivity : AppCompatActivity() {
                 i -> ntBookVersesStrings[i].split(",").map { it.toInt() }.toIntArray()
         }
 
-        val ntBooks = Array<MainActivity.BibleBook>(ntBookNames.count()) { i ->
-            MainActivity.BibleBook(
+        val ntBooks = Array<BibleBook>(ntBookNames.count()) { i ->
+            BibleBook(
                 ntBookNames[i],
                 ntBookChapters[i],
                 ntBookVersesPerChapter[i]
@@ -63,18 +60,12 @@ class MainActivity : AppCompatActivity() {
             assert(book.chapters == book.versesPerChapter.count())
         }
 
-        //val ntBookNames: Array<String> = resources.getStringArray(R.array.ntBookNames)
-        //val ntBookChapters: IntArray = resources.getIntArray(R.array.ntBookChapters)
-        //val ntBooks = Array<BibleBook>(ntBookNames.count()) {i -> BibleBook(ntBookNames[i], ntBookChapters[i])}
-
         var bookSpinner = findViewById<Spinner>(R.id.ntBookSpinner)
 
         ArrayAdapter.createFromResource(this, R.array.ntBookNames, R.layout.spinner_item
         ).also { adapter ->
 
-            var ntBookName : String
-            var ntBookChapter : Int = 0
-            var ntBookVerse : Int = 0
+            var ntBcv: BibleRef = BibleRef("x", 0, 0)
 
             // specify the layout to use when the list of choices appears
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -87,7 +78,7 @@ class MainActivity : AppCompatActivity() {
                     //findViewById<TextView>(R.id.ntBookName).text = ntBooks[position].name
                     //findViewById<TextView>(R.id.ntBookChapter).text = ntBooks[position].chapters.toString()
 
-                    ntBookName = ntBooks[position].name
+                    ntBcv.book = ntBooks[position].name
 
                     // populate the chapter spinner with an item for each chapter in the book
                     var chapterSpinner = findViewById<Spinner>(R.id.ntChapterSpinner)
@@ -97,18 +88,16 @@ class MainActivity : AppCompatActivity() {
                     chapterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                         override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
 
-                            ntBookChapter = parent.getItemAtPosition(position).toString().toInt()
+                            ntBcv.chapter = parent.getItemAtPosition(position).toString().toInt()
 
                             // populate the verse spinner with an item for each verse in the book
                             var verseSpinner = findViewById<Spinner>(R.id.ntVerseSpinner)
-                            verseSpinner.adapter = ArrayAdapter(this@MainActivity, R.layout.spinner_item, Array<Int>(ntBooks[position].versesPerChapter[position]) { i -> i + 1 })
+                            verseSpinner.adapter = ArrayAdapter(this@MainActivity, R.layout.spinner_item, Array<Int>(ntBooks[position].versesPerChapter[position]) { i -> i+1 })
 
                             verseSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                                 override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-
-                                    ntBookVerse = parent.getItemAtPosition(position).toString().toInt()
-                                    executeVerseLookup()
-
+                                    ntBcv.verse = parent.getItemAtPosition(position).toString().toInt()
+                                    executeVerseLookup(ntBcv)
                                 }
 
                                 override fun onNothingSelected(parent: AdapterView<*>) {
@@ -130,11 +119,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun executeVerseLookup() {
+    private fun executeVerseLookup(bcv: BibleRef) {
         GlobalScope.launch(Dispatchers.Main) {
-            val verseText = EsvApi().getVerseText("John 11:35") ?: "failed"
-            println("THE RESULT IS $verseText")
-            findViewById<TextView>(R.id.verseText).text = verseText
+            val verseText = EsvApi().getVerseText(bcv.toString()) ?: "failed"
+            findViewById<TextView>(R.id.ntVerseText).text = verseText
         }
     }
 }
