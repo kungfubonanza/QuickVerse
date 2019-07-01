@@ -5,6 +5,21 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import kotlinx.coroutines.*
+import android.text.method.ScrollingMovementMethod
+
+/**
+ * Data class that represents a reference to a specific book-chapter-verse.
+ */
+data class BibleRef(var book: String, var chapter: Int, var verse: Int) {
+    override fun toString(): String {
+        return "$book+$chapter:$verse"
+    }
+}
+
+/**
+ * Data class that describes a book of the Bible.
+ */
+data class BibleBook(val name: String, val chapters: Int, val versesPerChapter: IntArray)
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,6 +28,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // make the text views scrollable
+        findViewById<TextView>(R.id.ntVerseText).movementMethod = ScrollingMovementMethod()
+        findViewById<TextView>(R.id.otVerseText).movementMethod = ScrollingMovementMethod()
 
         // build an array of book names
         val ntBookNames: Array<String> = resources.getStringArray(R.array.ntBookNames)
@@ -120,6 +139,8 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+// TODO: Fix this code and use it instead of the terrible nested stuff above.
+/*
 class ntSpinnerActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
         // An item was selected. You can retrieve the selected item using
@@ -132,3 +153,4 @@ class ntSpinnerActivity : AppCompatActivity(), AdapterView.OnItemSelectedListene
         // Another interface callback
     }
 }
+*/

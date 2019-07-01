@@ -7,4 +7,5 @@
     <string name="random_heading">Here is a random number between 0 and %1d</string>
     <string name="old_testament_text">Old Testament</string>
     <string name="new_testament_text">New Testament</string>
+    <string name="chapter_verse_separator">:</string>
 </resources>
