@@ -6,7 +6,15 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 
-class EsvApi {
+class EsvApi(esvApiKey: String) {
+
+    /**
+     * Unique key that allows access to the ESV API. See https://api.esv.org/docs/ for how
+     * on get a key.
+     *
+     */
+    private val _esvApiKey: String = esvApiKey
+
     /**
      * Data class that models the fields in the "passage_meta" field contained in a JSON response
      * from the ESV API.
@@ -41,10 +49,7 @@ class EsvApi {
      */
     private val _esvApiBasePath: String = "https://api.esv.org/v3/passage/text/?"
 
-    /**
-     * Unique key that allows access to the ESV API.
-     */
-    private val _esvApiKey: String = ""
+
 
     /**
      * Converts the JSON [response] from the ESV API into an EsvApi.Response data object or null
@@ -65,10 +70,10 @@ class EsvApi {
         )
 
         // prepare the variable that we'll return
-        var verseText: String = String()
+        var verseText = String()
 
         // make the request to the server
-        val (request, response, result) = Fuel.get(
+        val (_, _, result) = Fuel.get(
             _esvApiBasePath,
             listOf("q" to verse)
         ).awaitStringResponseResult()
@@ -81,7 +86,7 @@ class EsvApi {
                 println("THE PASSAGE: $verseText")
             },
             { error ->
-                verseText = "Unable to retrieve text of $verse."
+                verseText = "Unable to retrieve text of $verse.\n\nError: $error."
             }
         )
 

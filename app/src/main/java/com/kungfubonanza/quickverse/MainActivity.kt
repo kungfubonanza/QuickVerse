@@ -1,5 +1,7 @@
 package com.kungfubonanza.quickverse
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -25,6 +27,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // grab the ESV API key--exit the app if it can't be retrieved
+        cacheEsvApiKey()
 
         // make the text views scrollable
         findViewById<TextView>(R.id.ntVerseText).movementMethod = ScrollingMovementMethod()
@@ -60,12 +65,12 @@ class MainActivity : AppCompatActivity() {
             assert(book.chapters == book.versesPerChapter.count())
         }
 
-        var bookSpinner = findViewById<Spinner>(R.id.ntBookSpinner)
+        val bookSpinner = findViewById<Spinner>(R.id.ntBookSpinner)
 
         ArrayAdapter.createFromResource(this, R.array.ntBookNames, R.layout.spinner_item
         ).also { adapter ->
 
-            var ntBcv: BibleRef = BibleRef("x", 0, 0)
+            val ntBcv = BibleRef("x", 0, 0)
 
             // specify the layout to use when the list of choices appears
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -81,7 +86,7 @@ class MainActivity : AppCompatActivity() {
                     ntBcv.book = ntBooks[position].name
 
                     // populate the chapter spinner with an item for each chapter in the book
-                    var chapterSpinner = findViewById<Spinner>(R.id.ntChapterSpinner)
+                    val chapterSpinner = findViewById<Spinner>(R.id.ntChapterSpinner)
                     chapterSpinner.adapter = ArrayAdapter(this@MainActivity, R.layout.spinner_item, Array<Int>(ntBooks[position].chapters) { i -> i+1})
 
                     // create an object that listens to the change of a chapter
@@ -91,7 +96,7 @@ class MainActivity : AppCompatActivity() {
                             ntBcv.chapter = parent.getItemAtPosition(position).toString().toInt()
 
                             // populate the verse spinner with an item for each verse in the book
-                            var verseSpinner = findViewById<Spinner>(R.id.ntVerseSpinner)
+                            val verseSpinner = findViewById<Spinner>(R.id.ntVerseSpinner)
                             verseSpinner.adapter = ArrayAdapter(this@MainActivity, R.layout.spinner_item, Array<Int>(ntBooks[position].versesPerChapter[position]) { i -> i+1 })
 
                             verseSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -119,9 +124,44 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * The API key used to retrieve data from the ESV API.
+     */
+    private var _esvApiKey: String = ""
+
+    /**
+     * Exits the application if the ESV API key cannot be retrieved.
+     */
+    private fun cacheEsvApiKey() {
+        val esvApiKeyResourceName = "@string/esvApiKey"
+        resources.getIdentifier(esvApiKeyResourceName, "string", this.packageName).also {
+            // TODO: Handle this more gently by giving the user the option of providing
+            //       his/her own API key.
+            if(0 == it) {
+                val builder = AlertDialog.Builder(this@MainActivity)
+                // Set the dialog title
+                builder.setTitle(R.string.esv_api_key_unavailable)
+                    // Set the action buttons
+                    .setPositiveButton(R.string.ok,
+                        DialogInterface.OnClickListener { _, _ ->
+                            // User clicked OK, so exit the application
+                            finishAffinity()
+                        })
+                    .create()
+                    .show()
+            } else {
+                // do that
+                _esvApiKey = resources.getString(resources.getIdentifier(esvApiKeyResourceName, "string", this.packageName))
+            }
+        }
+    }
+
+    /**
+     * Retrieves the verse identified by [bcv].
+     */
     private fun executeVerseLookup(bcv: BibleRef) {
         GlobalScope.launch(Dispatchers.Main) {
-            val verseText = EsvApi().getVerseText(bcv.toString()) ?: "failed"
+            val verseText = EsvApi(_esvApiKey).getVerseText(bcv.toString()) ?: "failed"
             findViewById<TextView>(R.id.ntVerseText).text = verseText
         }
     }

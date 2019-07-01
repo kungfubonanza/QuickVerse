@@ -8,4 +8,6 @@
     <string name="old_testament_text">Old Testament</string>
     <string name="new_testament_text">New Testament</string>
     <string name="chapter_verse_separator">:</string>
+    <string name="esv_api_key_unavailable">Oh no! The application was built without an ESV API key, so it will exit.</string>
+    <string name="ok">OK</string>
 </resources>
