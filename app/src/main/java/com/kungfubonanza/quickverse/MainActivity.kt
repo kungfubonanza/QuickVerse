@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.annotation.IdRes
 import android.view.View
 import android.widget.*
 import kotlinx.coroutines.*
@@ -19,11 +20,45 @@ data class BibleRef(var book: String, var chapter: Int, var verse: Int) {
 }
 
 /**
+ *
  * Data class that describes a book of the Bible.
  */
-data class BibleBook(val name: String, val chapters: Int, val versesPerChapter: IntArray)
+data class BibleBook(val name: String, val chapters: Int, val versesPerChapter: List<Int>)
 
 class MainActivity : AppCompatActivity() {
+
+    /**
+     * Returns an Array of BibleBooks described by the resource identified by [res].
+     */
+    private fun getBooks(res : Int) = Array<BibleBook>(resources.getStringArray(res).count()) {
+        // build an array of strings that each describe a book
+        // * each string is of the form "bookName:A,B,C", where A is the number of
+        //   verses in the first chapter, B is the number of verses in the second
+        //   chapter, etc.
+        // * of course, the number of verses for each chapter is given
+        val bookDescriptions = resources.getStringArray(res)
+
+        // build an array of BibleBook objects -- each object is created based on the
+        // information given in its bookDescription string
+        val books = Array<BibleBook>(bookDescriptions.count()) { i ->
+            // split the string into a book name and a list of chapters
+            val (bookName, chapters) = bookDescriptions[i].split(":")
+            // build an array of ints -- each int is the number of verses in a chapter
+            val chapterCounts = chapters.split(",").map { it.toInt() }
+            // create a BibleBook object from the name, number of chapters, and
+            // verses in each chapter
+            BibleBook(
+                bookName,
+                chapterCounts.count(),
+                chapterCounts
+            )
+        }
+
+        books.forEach { assert(it.chapters == it.versesPerChapter.count()) }
+
+        return books
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,39 +70,11 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.ntVerseText).movementMethod = ScrollingMovementMethod()
         findViewById<TextView>(R.id.otVerseText).movementMethod = ScrollingMovementMethod()
 
-        // build an array of book names
-        val ntBookNames: Array<String> = resources.getStringArray(R.array.ntBookNames)
-        // build an array of book chapter counts
-        val ntBookChapters: IntArray = resources.getIntArray(R.array.ntBookChapters)
-        // build an array of strings in which each string contains a comma-separated list of verses in each chapter
-        val ntBookVersesStrings = resources.getStringArray(R.array.ntVersesPerChapter)
-
-        // build an array of integer arrays
-        // * each integer array corresponds to a book
-        // * each integer in each array represents the number of chapters in a book
-        //val x = ntBookVersesStrings[0].split(",").map { it.toInt() }.toIntArray()
-        val ntBookVersesPerChapter = Array<IntArray>(ntBookNames.count()) {
-            // 1. split each string
-            // 2. create a list of integers by converting each string to an integer
-            // 3. convert each list to an IntArray, and then put the IntArray in the big array
-                i -> ntBookVersesStrings[i].split(",").map { it.toInt() }.toIntArray()
-        }
-
-        val ntBooks = Array<BibleBook>(ntBookNames.count()) { i ->
-            BibleBook(
-                ntBookNames[i],
-                ntBookChapters[i],
-                ntBookVersesPerChapter[i]
-            )
-        }
-
-        for(book in ntBooks) {
-            assert(book.chapters == book.versesPerChapter.count())
-        }
+        val ntBooks = getBooks(R.array.ntBooks)
 
         val bookSpinner = findViewById<Spinner>(R.id.ntBookSpinner)
 
-        ArrayAdapter.createFromResource(this, R.array.ntBookNames, R.layout.spinner_item
+        ArrayAdapter(this, R.layout.spinner_item, Array<String>(ntBooks.count()) { i -> ntBooks[i].name }
         ).also { adapter ->
 
             val ntBcv = BibleRef("x", 0, 0)
@@ -79,9 +86,6 @@ class MainActivity : AppCompatActivity() {
             // Create an object that listens to the change of a book
             bookSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-
-                    //findViewById<TextView>(R.id.ntBookName).text = ntBooks[position].name
-                    //findViewById<TextView>(R.id.ntBookChapter).text = ntBooks[position].chapters.toString()
 
                     ntBcv.book = ntBooks[position].name
 
