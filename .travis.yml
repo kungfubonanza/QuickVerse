@@ -1,10 +1,14 @@
 language: android
 dist: trusty
 android:
-  components:
-  - tools
-  - platform-tools
-  - android-28
-  - build-tools-29.0.0
-  
+    components:
+        - tools
+        - platform-tools
+        - android-28
+        - build-tools-29.0.0
+        - add-on
+        - extra
+licenses:
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
 install: false
