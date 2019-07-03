@@ -13,7 +13,7 @@ import android.text.method.ScrollingMovementMethod
 /**
  * Data class that represents a reference to a specific book-chapter-verse.
  */
-data class BibleRef(var book: String, var chapter: Int, var verse: Int) {
+data class BibleRef(var book: String = "Genesis", var chapter: Int = 1, var verse: Int = 1) {
     override fun toString(): String {
         return "$book+$chapter:$verse"
     }
@@ -70,43 +70,68 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.ntVerseText).movementMethod = ScrollingMovementMethod()
         findViewById<TextView>(R.id.otVerseText).movementMethod = ScrollingMovementMethod()
 
-        val ntBooks = getBooks(R.array.ntBooks)
+        // set up the OT spinners
+        activateViews(getBooks(R.array.otBooks), R.id.otBookSpinner, R.id.otChapterSpinner, R.id.otVerseSpinner, R.id.otVerseText)
 
-        val bookSpinner = findViewById<Spinner>(R.id.ntBookSpinner)
+        // set up the OT spinners
+        activateViews(getBooks(R.array.ntBooks), R.id.ntBookSpinner, R.id.ntChapterSpinner, R.id.ntVerseSpinner, R.id.ntVerseText)
+    }
 
-        ArrayAdapter(this, R.layout.spinner_item, Array<String>(ntBooks.count()) { i -> ntBooks[i].name }
+    /**
+     * Activates the spinners and the verse view for [books].
+     * @param books Array that describes the books whose associated views are being activated
+     * @param bookSpinnerRes Id of the spinner that allows selection of a book
+     * @param chapterSpinnerRes Id of the spinner that allows selection of a chapter
+     * @param verseSpinnerRes Id of the spinner that allows selection of a verse
+     * @param verseTextRes Id of the view that displays the selected verse
+     */
+    private fun activateViews(books: Array<BibleBook>, @IdRes bookSpinnerRes: Int, @IdRes chapterSpinnerRes: Int, @IdRes verseSpinnerRes: Int, @IdRes verseTextRes: Int) {
+        val bookSpinner = findViewById<Spinner>(bookSpinnerRes)
+
+        ArrayAdapter(this, R.layout.spinner_item, Array<String>(books.count()) { i -> books[i].name }
         ).also { adapter ->
 
-            val ntBcv = BibleRef("x", 0, 0)
 
             // specify the layout to use when the list of choices appears
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             // apply the adapter to the spinner
             bookSpinner.adapter = adapter
             // Create an object that listens to the change of a book
+
             bookSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
 
-                    ntBcv.book = ntBooks[position].name
+                    val bibleRef = BibleRef(books[position].name)
 
                     // populate the chapter spinner with an item for each chapter in the book
-                    val chapterSpinner = findViewById<Spinner>(R.id.ntChapterSpinner)
-                    chapterSpinner.adapter = ArrayAdapter(this@MainActivity, R.layout.spinner_item, Array<Int>(ntBooks[position].chapters) { i -> i+1})
+                    val chapterSpinner = findViewById<Spinner>(chapterSpinnerRes)
+                    chapterSpinner.adapter = ArrayAdapter(
+                        this@MainActivity,
+                        R.layout.spinner_item,
+                        Array<Int>(books[position].chapters) { i -> i + 1 })
 
                     // create an object that listens to the change of a chapter
                     chapterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                         override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
 
-                            ntBcv.chapter = parent.getItemAtPosition(position).toString().toInt()
+                            bibleRef.chapter = parent.getItemAtPosition(position).toString().toInt()
 
                             // populate the verse spinner with an item for each verse in the book
-                            val verseSpinner = findViewById<Spinner>(R.id.ntVerseSpinner)
-                            verseSpinner.adapter = ArrayAdapter(this@MainActivity, R.layout.spinner_item, Array<Int>(ntBooks[position].versesPerChapter[position]) { i -> i+1 })
+                            val verseSpinner = findViewById<Spinner>(verseSpinnerRes)
+                            verseSpinner.adapter = ArrayAdapter(
+                                this@MainActivity,
+                                R.layout.spinner_item,
+                                Array<Int>(books[position].versesPerChapter[position]) { i -> i + 1 })
 
                             verseSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                                override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                                    ntBcv.verse = parent.getItemAtPosition(position).toString().toInt()
-                                    executeVerseLookup(ntBcv)
+                                override fun onItemSelected(
+                                    parent: AdapterView<*>,
+                                    view: View,
+                                    position: Int,
+                                    id: Long
+                                ) {
+                                    bibleRef.verse = parent.getItemAtPosition(position).toString().toInt()
+                                    executeVerseLookup(bibleRef, verseTextRes)
                                 }
 
                                 override fun onNothingSelected(parent: AdapterView<*>) {
@@ -154,24 +179,24 @@ class MainActivity : AppCompatActivity() {
                     .create()
                     .show()
             } else {
-                // do that
+                // cache the key provided by the resource file
                 _esvApiKey = resources.getString(resources.getIdentifier(esvApiKeyResourceName, "string", this.packageName))
             }
         }
     }
 
     /**
-     * Retrieves the verse identified by [bcv].
+     * Retrieves the verse identified by [ref].
      */
-    private fun executeVerseLookup(bcv: BibleRef) {
+    private fun executeVerseLookup(ref: BibleRef, @IdRes verseTextRes: Int) {
         GlobalScope.launch(Dispatchers.Main) {
-            val verseText = EsvApi(_esvApiKey).getVerseText(bcv.toString()) ?: "failed"
-            findViewById<TextView>(R.id.ntVerseText).text = verseText
+            val verseText = EsvApi(_esvApiKey).getVerseText(ref.toString()) ?: "failed"
+            findViewById<TextView>(verseTextRes).text = verseText
         }
     }
 }
 
-// TODO: Fix this code and use it instead of the terrible nested stuff above.
+// TODO: Use this code instead of the nested stuff above?
 /*
 class ntSpinnerActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {

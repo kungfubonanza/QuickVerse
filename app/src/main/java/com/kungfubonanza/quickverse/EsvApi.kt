@@ -25,9 +25,9 @@ class EsvApi(esvApiKey: String) {
         val canonical: String,
         val chapter_start: List<Int>,
         val chapter_end: List<Int>,
-        val prev_verse: Int,
+        val prev_verse: Int?, // is allowed to be null because prev_verse for Genesis 1:1 is null
         val next_verse: Int,
-        val prev_chapter: List<Int>,
+        val prev_chapter: List<Int>?, // is allowed to be null because prev_chapter for Genesis 1:1 is null
         val next_chapter: List<Int>
     )
 
