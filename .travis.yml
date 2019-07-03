@@ -1,5 +1,10 @@
-language: java
-jdk:
-  - oraclejdk8
+language: android
+dist: trusty
+android:
+  components:
+  - tools
+  - platform-tools
+  - android-28
+  - build-tools-29.0.0
   
 install: false
