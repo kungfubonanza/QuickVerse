@@ -75,7 +75,12 @@ class EsvApi(esvApiKey: String) {
         // make the request to the server
         val (_, _, result) = Fuel.get(
             _esvApiBasePath,
-            listOf("q" to verse)
+            listOf("q" to verse,
+                "include-headings" to "false",
+                "include-passage-references" to "false",
+                "include-footnotes" to "false",
+                "include-verse-numbers" to "false"
+                )
         ).awaitStringResponseResult()
 
         // parse the result
@@ -83,7 +88,7 @@ class EsvApi(esvApiKey: String) {
             { data ->
                 val apiResponse = parseJsonResponse(data)
                 verseText = apiResponse?.passages?.get(0) ?: "Invalid JSON returned by ESV API."
-                println("THE PASSAGE: $verseText")
+                //println("THE PASSAGE: $verseText")
             },
             { error ->
                 verseText = "Unable to retrieve text of $verse.\n\nError: $error."
