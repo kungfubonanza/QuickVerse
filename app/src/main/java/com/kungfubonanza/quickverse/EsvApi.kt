@@ -6,14 +6,46 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 
-class EsvApi(esvApiKey: String) {
+/**
+ * Class that provides Bible passages retrieved from the ESV API at
+ * https://api.esv.org.
+ */
+class EsvApi(esvApiKey: String = "TOKEN <insert key here>"): BiblePassageProvider {
+    private val _esvApiKey: String = esvApiKey
 
     /**
-     * Unique key that allows access to the ESV API. See https://api.esv.org/docs/ for how
-     * on get a key.
-     *
+     * Parameters that customize the content returned by the ESV API.
      */
-    private val _esvApiKey: String = esvApiKey
+    private val _parameters: MutableMap<String, Boolean> = mutableMapOf(
+        "include-headings" to false,
+        "include-passage-references" to false,
+        "include-footnotes" to false,
+        "include-verse-numbers" to false
+    )
+
+    var includeHeadings: Boolean
+        get() = _parameters.getOrElse("include-headings", {false})
+        set(value) = _parameters.set("include-headings", value)
+
+    var includePassageReferences: Boolean
+        get() = _parameters.getOrElse("include-passage-references", {false})
+        set(value) = _parameters.set("include-passage-references", value)
+
+    var includeFootnotes: Boolean
+        get() = _parameters.getOrElse("include-footnotes", {false})
+        set(value) = _parameters.set("include-footnotes", value)
+
+    var includeVerseNumbers: Boolean
+        get() = _parameters.getOrElse("include-verse-numbers", {false})
+        set(value) = _parameters.set("include-verse-numbers", value)
+
+    init {
+        // set up the FuelManager
+        FuelManager.instance.baseHeaders = mapOf(
+            Headers.ACCEPT to "application/json",
+            Headers.AUTHORIZATION to _esvApiKey
+        )
+    }
 
     /**
      * Data class that models the fields in the "passage_meta" field contained in a JSON response
@@ -21,7 +53,7 @@ class EsvApi(esvApiKey: String) {
      *
      * Note that the variable names are identical to the field names in the JSON.
      */
-    data class EsvApiResponsePassageMeta(
+    private data class EsvApiResponsePassageMeta(
         val canonical: String,
         val chapter_start: List<Int>,
         val chapter_end: List<Int>,
@@ -36,7 +68,7 @@ class EsvApi(esvApiKey: String) {
      *
      * Note that the variable names are identical to the field names in the JSON.
      */
-    data class Response(
+    private data class Response(
         val query: String,
         val canonical: String,
         val parsed: List<List<Int>>,
@@ -49,53 +81,49 @@ class EsvApi(esvApiKey: String) {
      */
     private val _esvApiBasePath: String = "https://api.esv.org/v3/passage/text/?"
 
-
-
     /**
      * Converts the JSON [response] from the ESV API into an EsvApi.Response data object or null
      * if parsing failed.
      */
-    internal fun parseJsonResponse(response: String): Response? {
+    private fun parseJsonResponse(response: String): Response? {
         return Klaxon().parse<Response>(response)
     }
 
     /**
-     * Provides the full text of [verse] as returned by the ESV API.
+     *  Returns the passage for [ref]. The text for the passage
+     *  is provided by the ESV API.
      */
-    suspend fun getVerseText(verse: String = "John 11:35"): String {
-        // set up the FuelManager
-        FuelManager.instance.baseHeaders = mapOf(
-            Headers.ACCEPT to "application/json",
-            Headers.AUTHORIZATION to _esvApiKey
-        )
+    override suspend fun passage(ref: BibleRef): BiblePassage {
+        return getVerseText(ref)
+    }
 
+    /**
+     * Returns the full text (from the ESV API) of [ref].
+     */
+    private suspend fun getVerseText(ref: BibleRef = BibleRef("John", 11, 35)): BiblePassage {
         // prepare the variable that we'll return
+
         var verseText = String()
 
         // make the request to the server
         val (_, _, result) = Fuel.get(
             _esvApiBasePath,
-            listOf("q" to verse,
-                "include-headings" to "false",
-                "include-passage-references" to "false",
-                "include-footnotes" to "false",
-                "include-verse-numbers" to "false"
-                )
+            listOf("q" to ref.toString().replace("\\s+", "")) + _parameters.toList()
         ).awaitStringResponseResult()
 
         // parse the result
         result.fold(
             { data ->
                 val apiResponse = parseJsonResponse(data)
-                verseText = apiResponse?.passages?.get(0) ?: "Invalid JSON returned by ESV API."
+                verseText = apiResponse?.passages?.get(0)?.trim() ?: "Invalid JSON returned by ESV API."
                 //println("THE PASSAGE: $verseText")
             },
             { error ->
-                verseText = "Unable to retrieve text of $verse.\n\nError: $error."
+                verseText = "Unable to retrieve text of $ref.toString().\n\nError: $error."
             }
         )
 
         // return the text or an error string
-        return verseText
+        return BiblePassage(ref, verseText)
     }
 }

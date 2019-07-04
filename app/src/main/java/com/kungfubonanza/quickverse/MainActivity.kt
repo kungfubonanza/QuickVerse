@@ -7,26 +7,20 @@ import android.os.Bundle
 import android.support.annotation.IdRes
 import android.view.View
 import android.widget.*
-import kotlinx.coroutines.*
 import android.text.method.ScrollingMovementMethod
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
- * Data class that represents a reference to a specific book-chapter-verse.
- */
-data class BibleRef(var book: String = "Genesis", var chapter: Int = 1, var verse: Int = 1) {
-    override fun toString(): String {
-        return "$book+$chapter:$verse"
-    }
-}
-
-/**
- *
  * Data class that describes a book of the Bible.
  */
 data class BibleBook(val name: String, val chapters: Int, val versesPerChapter: List<Int>)
 
+/**
+ * The main activity that is executed and shown on application startup.
+ */
 class MainActivity : AppCompatActivity() {
-
     /**
      * Returns an Array of BibleBooks described by the resource identified by [res].
      */
@@ -61,6 +55,9 @@ class MainActivity : AppCompatActivity() {
         return books
     }
 
+    /**
+     * Function override that is executed when the activity is created.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -190,8 +187,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun executeVerseLookup(ref: BibleRef, @IdRes verseTextRes: Int) {
         GlobalScope.launch(Dispatchers.Main) {
-            val verseText = EsvApi(_esvApiKey).getVerseText(ref.toString()) ?: "failed"
-            findViewById<TextView>(verseTextRes).text = verseText
+            findViewById<TextView>(verseTextRes).text = EsvApi(_esvApiKey).passage(ref).text
         }
     }
 }
