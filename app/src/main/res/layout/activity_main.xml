@@ -10,7 +10,7 @@
         android:id="@+id/otVerticalLayout"
         android:layout_width="0dp"
         android:layout_height="319dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="64dp"
         android:layout_marginBottom="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/ntVerticalLayout"
@@ -88,7 +88,8 @@
             android:layout_height="match_parent"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:scrollbars = "vertical"
+            android:scrollbars="vertical"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             tools:layout_editor_absoluteY="356dp" />
@@ -176,7 +177,8 @@
             android:layout_height="match_parent"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:scrollbars = "vertical"
+            android:scrollbars="vertical"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             tools:layout_editor_absoluteY="356dp" />

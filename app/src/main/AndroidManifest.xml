@@ -15,7 +15,5 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.kungfubonanza.quickverse.SecondActivity" />
-        <activity android:name="com.kungfubonanza.quickverse.MainExampleActivity" />
     </application>
 </manifest>
