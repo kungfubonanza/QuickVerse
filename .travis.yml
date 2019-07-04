@@ -19,6 +19,6 @@ android:
 install: false
 before_script:
     - mkdir -p "$ANDROID_HOME/licenses"
-    - cp ./google-licenses/* "$ANDROID_HOME/licenses/"
+    - cp ./.google-licenses/* "$ANDROID_HOME/licenses/"
 script:
     - ./gradlew build check
