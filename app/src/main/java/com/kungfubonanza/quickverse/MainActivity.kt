@@ -54,6 +54,8 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        // ideally, this would be unit tested, but unit testing resource files
+        // without mocking is tough, so we'll do this for now
         books.forEach { assert(it.chapters == it.versesPerChapter.count()) }
 
         return books
@@ -90,8 +92,6 @@ class MainActivity : AppCompatActivity() {
 
         ArrayAdapter(this, R.layout.spinner_item, Array<String>(books.count()) { i -> books[i].name }
         ).also { adapter ->
-
-
             // specify the layout to use when the list of choices appears
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             // apply the adapter to the spinner
