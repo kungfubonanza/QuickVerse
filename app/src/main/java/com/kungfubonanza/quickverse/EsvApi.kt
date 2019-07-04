@@ -6,7 +6,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 
-class EsvApi(esvApiKey: String) {
+class EsvApi(esvApiKey: String = "TOKEN <insert key here>") {
 
     /**
      * Unique key that allows access to the ESV API. See https://api.esv.org/docs/ for how
