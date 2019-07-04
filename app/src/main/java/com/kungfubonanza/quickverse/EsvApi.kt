@@ -17,27 +17,55 @@ class EsvApi(esvApiKey: String = "TOKEN <insert key here>"): BiblePassageProvide
      * Parameters that customize the content returned by the ESV API.
      */
     private val _parameters: MutableMap<String, Boolean> = mutableMapOf(
-        "include-headings" to false,
         "include-passage-references" to false,
+        "include-verse-numbers" to false,
+        "include-first-verse-numbers" to false,
         "include-footnotes" to false,
-        "include-verse-numbers" to false
-    )
+        "include-footnote-body" to false,
+        "include-headings" to false
+        )
 
-    var includeHeadings: Boolean
-        get() = _parameters.getOrElse("include-headings", {false})
-        set(value) = _parameters.set("include-headings", value)
-
+    /**
+     * Include passage references in the passage text.
+     */
     var includePassageReferences: Boolean
         get() = _parameters.getOrElse("include-passage-references", {false})
         set(value) = _parameters.set("include-passage-references", value)
 
+    /**
+     * Include verse numbers in the passage text.
+     */
+    var includeVerseNumbers: Boolean
+        get() = _parameters.getOrElse("include-verse-numbers", {false})
+        set(value) = _parameters.set("include-verse-numbers", value)
+
+    /**
+     * Include first verse numbers in the passage text.
+     */
+    var includeFirstVerseNumbers: Boolean
+        get() = _parameters.getOrElse("include-first-verse-numbers", {false})
+        set(value) = _parameters.set("include-first-verse-numbers", value)
+
+    /**
+     * Include footnotes in the passage text.
+     */
     var includeFootnotes: Boolean
         get() = _parameters.getOrElse("include-footnotes", {false})
         set(value) = _parameters.set("include-footnotes", value)
 
-    var includeVerseNumbers: Boolean
-        get() = _parameters.getOrElse("include-verse-numbers", {false})
-        set(value) = _parameters.set("include-verse-numbers", value)
+    /**
+     * Include footnote body in the passage text.
+     */
+    var includeFootnoteBody: Boolean
+        get() = _parameters.getOrElse("include-footnote-body", {false})
+        set(value) = _parameters.set("include-footnote-body", value)
+
+    /**
+     * Include section headings in the passage text.
+     */
+    var includeHeadings: Boolean
+        get() = _parameters.getOrElse("include-headings", {false})
+        set(value) = _parameters.set("include-headings", value)
 
     init {
         // set up the FuelManager
@@ -53,7 +81,7 @@ class EsvApi(esvApiKey: String = "TOKEN <insert key here>"): BiblePassageProvide
      *
      * Note that the variable names are identical to the field names in the JSON.
      */
-    data class EsvApiResponsePassageMeta(
+    data class ResponsePassageMeta(
         val canonical: String,
         val chapter_start: List<Int>,
         val chapter_end: List<Int>,
@@ -72,7 +100,7 @@ class EsvApi(esvApiKey: String = "TOKEN <insert key here>"): BiblePassageProvide
         val query: String,
         val canonical: String,
         val parsed: List<List<Int>>,
-        val passage_meta: List<EsvApiResponsePassageMeta>,
+        val passage_meta: List<ResponsePassageMeta>,
         val passages: List<String>
     )
 
@@ -100,9 +128,7 @@ class EsvApi(esvApiKey: String = "TOKEN <insert key here>"): BiblePassageProvide
     /**
      * Returns the full text (from the ESV API) of [ref].
      */
-    private suspend fun getVerseText(ref: BibleRef = BibleRef("John", 11, 35)): BiblePassage {
-        // prepare the variable that we'll return
-
+    private suspend fun getVerseText(ref: BibleRef = BibleRef()): BiblePassage {
         var verseText = String()
 
         // make the request to the server
