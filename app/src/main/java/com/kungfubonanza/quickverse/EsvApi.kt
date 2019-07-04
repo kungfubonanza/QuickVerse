@@ -53,7 +53,7 @@ class EsvApi(esvApiKey: String = "TOKEN <insert key here>"): BiblePassageProvide
      *
      * Note that the variable names are identical to the field names in the JSON.
      */
-    private data class EsvApiResponsePassageMeta(
+    data class EsvApiResponsePassageMeta(
         val canonical: String,
         val chapter_start: List<Int>,
         val chapter_end: List<Int>,
@@ -68,7 +68,7 @@ class EsvApi(esvApiKey: String = "TOKEN <insert key here>"): BiblePassageProvide
      *
      * Note that the variable names are identical to the field names in the JSON.
      */
-    private data class Response(
+    data class Response(
         val query: String,
         val canonical: String,
         val parsed: List<List<Int>>,
@@ -85,7 +85,7 @@ class EsvApi(esvApiKey: String = "TOKEN <insert key here>"): BiblePassageProvide
      * Converts the JSON [response] from the ESV API into an EsvApi.Response data object or null
      * if parsing failed.
      */
-    private fun parseJsonResponse(response: String): Response? {
+    fun parseJsonResponse(response: String): Response? {
         return Klaxon().parse<Response>(response)
     }
 
